@@ -1,0 +1,60 @@
+
+.example3 .navbar-brand {
+  height: 80px;
+}
+
+.example3 .nav >li >a {
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
+.example3 .navbar-toggle {
+  padding: 10px;
+  margin: 25px 15px 25px 0;
+}
+
+
+input[type=text],[type=password], select {
+  display: block;
+     font-size:13px;
+     padding:4px 2px;
+     border:solid 1px #aacfe4;
+     width:39%;
+     margin:2px 0 20px 10px;
+ }
+ 
+ 
+ label {
+     /* Other styling... */
+     text-align: right;
+     clear: both;
+     float:left;
+     margin-right:15px;
+ }
+ 
+ input[type=submit] {
+   width: 200px;
+   background-color: #4058df;
+   color: white;
+   padding: 14px 20px;
+   margin: 8px 0;
+   border: none;
+   border-radius: 4px;
+   cursor: pointer;
+ }
+ 
+ input[type=submit]:hover {
+   background-color: #000000;
+ }
+ 
+
+.footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: green;
+  color: white;
+  text-align: center;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
