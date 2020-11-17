@@ -11,13 +11,19 @@ if($_POST["sql"] != '')
 {
 	$search_array = explode(",", $_POST["sql"]);
 	$search_text = "'" . implode("', '", $search_array) . "'";
+	$_SESSION['sess_search_text']=$search_text;
 	$sql = "
 	SELECT course.*,courseoffer.CourseCode  FROM course,courseoffer 
-	WHERE courseoffer.SemesterCode IN (".$search_text.") and course.CourseCode=	courseoffer.CourseCode";
+	WHERE  course.CourseCode  NOT IN
+	(SELECT CourseCode
+	 FROM   registration) and
+	 courseoffer.SemesterCode IN (".$search_text.") and course.CourseCode=	courseoffer.CourseCode ";
 }
 else
 {
-	$sql = "SELECT * FROM course";
+	$sql = "SELECT * FROM course WHERE  course.CourseCode  NOT IN
+	(SELECT CourseCode
+	 FROM   registration)";
 }
 
 $query = $dbConn->prepare($sql);

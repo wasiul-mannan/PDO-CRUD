@@ -16,6 +16,50 @@ $statement->execute();
 
 $result = $statement->fetchAll();
 
+
+
+if (isset($_POST['Submit'])) {
+    $registeredCourses = null;
+    $SemesterCode = null;
+    if (!empty($_POST['coursecode'])) {
+
+        foreach ($_POST['coursecode'] as $value) {
+            try {
+                $StudentId = $_SESSION['sess_student_id'];
+                $CourseCode = $value;
+
+                $sqlqueryone = "SELECT SemesterCode FROM courseoffer WHERE CourseCode='$CourseCode' ";
+                $statementone = $dbConn->prepare($sqlqueryone);
+                $statementone->execute();
+                $resultone = $statementone->fetchAll();
+                foreach ($resultone as $rowone) {
+                    $SemesterCode = $rowone["SemesterCode"];
+                    $mystring = $_SESSION['sess_search_text'];
+                    if (strpos($mystring, $SemesterCode) !== false) {
+                        
+                        $sqlquery = "INSERT INTO registration(StudentId,CourseCode,SemesterCode) VALUES(:StudentId, :CourseCode, :SemesterCode)";
+                        $query = $dbConn->prepare($sqlquery);
+
+                        $query->bindparam(':StudentId', $StudentId);
+                        $query->bindparam(':CourseCode', $CourseCode);
+                        $query->bindparam(':SemesterCode', $SemesterCode);
+                        $query->execute();
+                    }
+                }
+                header('location:CourseSelection.php');
+            } catch (PDOException $e) {
+                echo $e;
+            }
+
+            if ($registeredCourses == null)
+                $registeredCourses = $value;
+            else
+                $registeredCourses = $registeredCourses . ',' . $value;
+        }
+
+        echo "value : " . $registeredCourses . '<br/>';
+    }
+}
 ?>
 <html>
 
@@ -74,7 +118,7 @@ $result = $statement->fetchAll();
                     <select name="multi_search_filter" id="multi_search_filter" multiple class="form-control selectpicker">
                         <?php
                         foreach ($result as $row) {
-                            echo '<option value="'.$row["SemesterCode"]. '">' . $row["Year"] . ' ' . $row["Term"] . '</option>';
+                            echo '<option value="' . $row["SemesterCode"] . '">' . $row["Year"] . ' ' . $row["Term"] . '</option>';
                         }
                         ?>
                     </select>
@@ -98,6 +142,7 @@ $result = $statement->fetchAll();
                         <tbody>
                         </tbody>
                     </table>
+
                 </div>
                 <div style="padding-left: 16%; position: absolute; right: 12.5%">
                     <input style="width: 200px; background-color: #4058df; color: white;  padding: 14px 20px; margin: 8px 0; border: none; border-radius: 4px; cursor: pointer;" type="submit" name="Submit" value="Submit">
