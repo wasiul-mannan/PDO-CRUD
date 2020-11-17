@@ -46,6 +46,7 @@ if($total_row > 0)
 			<td>'.$row["Title"].'</td>
 			<td>'.$row["WeeklyHours"].'</td>
 			<td><input type="checkbox" name="coursecode[]" value='.$row["CourseCode"].'></td>
+			<td style="display:none;"><input type="number" name="WeeklyHours" value='.$row["WeeklyHours"].'></td>
 		</tr>
 		';
 	}

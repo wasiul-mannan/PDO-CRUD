@@ -7,57 +7,88 @@ if (isset($_SESSION['sess_student_id']) == null) {
 
 include_once("config.php");
 
-
 $sql = "SELECT SemesterCode,Term,Year FROM semester";
-
 $statement = $dbConn->prepare($sql);
-
 $statement->execute();
-
 $result = $statement->fetchAll();
 
+$StudentIdhour = $_SESSION['sess_student_id'];
+$totalHour = 16;
+$bookedhour = null;
+$sqlhour = " SELECT course.*,registration.CourseCode  FROM course,registration 
+WHERE  StudentId='$StudentIdhour' and course.CourseCode=registration.CourseCode ";
+$statementhour = $dbConn->prepare($sqlhour);
+$statementhour->execute();
+$resulthour = $statementhour->fetchAll();
+foreach ($resulthour as $sumhour) {
+    $bookedhour = $bookedhour + $sumhour["WeeklyHours"];
+}
+$lefthour = $totalHour - $bookedhour;
 
+$errormsg = null;
+$bookedwweklyhour = 0;
 
 if (isset($_POST['Submit'])) {
     $registeredCourses = null;
     $SemesterCode = null;
+
     if (!empty($_POST['coursecode'])) {
 
+
         foreach ($_POST['coursecode'] as $value) {
-            try {
-                $StudentId = $_SESSION['sess_student_id'];
-                $CourseCode = $value;
+            $StudentId = $_SESSION['sess_student_id'];
+            $CourseCode = $value;
 
-                $sqlqueryone = "SELECT SemesterCode FROM courseoffer WHERE CourseCode='$CourseCode' ";
-                $statementone = $dbConn->prepare($sqlqueryone);
-                $statementone->execute();
-                $resultone = $statementone->fetchAll();
-                foreach ($resultone as $rowone) {
-                    $SemesterCode = $rowone["SemesterCode"];
-                    $mystring = $_SESSION['sess_search_text'];
-                    if (strpos($mystring, $SemesterCode) !== false) {
-                        
-                        $sqlquery = "INSERT INTO registration(StudentId,CourseCode,SemesterCode) VALUES(:StudentId, :CourseCode, :SemesterCode)";
-                        $query = $dbConn->prepare($sqlquery);
 
-                        $query->bindparam(':StudentId', $StudentId);
-                        $query->bindparam(':CourseCode', $CourseCode);
-                        $query->bindparam(':SemesterCode', $SemesterCode);
-                        $query->execute();
-                    }
-                }
-                header('location:CourseSelection.php');
-            } catch (PDOException $e) {
-                echo $e;
+            $sqlwweklyhour = "SELECT WeeklyHours From course WHERE CourseCode='$CourseCode' ";
+            $statementwweklyhour = $dbConn->prepare($sqlwweklyhour);
+            $statementwweklyhour->execute();
+            $resultwweklyhour = $statementwweklyhour->fetchAll();
+            foreach ($resultwweklyhour as $sumwweklyhour) {
+                $bookedwweklyhour = $bookedwweklyhour + $sumwweklyhour["WeeklyHours"];
             }
-
-            if ($registeredCourses == null)
-                $registeredCourses = $value;
-            else
-                $registeredCourses = $registeredCourses . ',' . $value;
         }
+        if ($bookedwweklyhour <= $lefthour) {
 
-        echo "value : " . $registeredCourses . '<br/>';
+            foreach ($_POST['coursecode'] as $value) {
+
+                try {
+                    $StudentId = $_SESSION['sess_student_id'];
+                    $CourseCode = $value;
+
+                    $sqlqueryone = "SELECT SemesterCode FROM courseoffer WHERE CourseCode='$CourseCode' ";
+                    $statementone = $dbConn->prepare($sqlqueryone);
+                    $statementone->execute();
+                    $resultone = $statementone->fetchAll();
+                    foreach ($resultone as $rowone) {
+                        $SemesterCode = $rowone["SemesterCode"];
+                        $mystring = $_SESSION['sess_search_text'];
+                        if (strpos($mystring, $SemesterCode) !== false) {
+
+                            $sqlquery = "INSERT INTO registration(StudentId,CourseCode,SemesterCode) VALUES(:StudentId, :CourseCode, :SemesterCode)";
+                            $query = $dbConn->prepare($sqlquery);
+
+                            $query->bindparam(':StudentId', $StudentId);
+                            $query->bindparam(':CourseCode', $CourseCode);
+                            $query->bindparam(':SemesterCode', $SemesterCode);
+                            $query->execute();
+                        }
+                    }
+                    header('location:CourseSelection.php');
+                } catch (PDOException $e) {
+                    echo $e;
+                }
+
+                // if ($registeredCourses == null)
+                //     $registeredCourses = $value;
+                // else
+                //     $registeredCourses = $registeredCourses . ',' . $value;
+            }
+        }else{
+            $errormsg="Your selection exceed the max weekly hour.";
+        }
+    } else {
+        $errormsg = "You need to select at least one course.";
     }
 }
 ?>
@@ -109,8 +140,8 @@ if (isset($_POST['Submit'])) {
         <br />
         <h2 style="padding-left: 5%;">Course Selection</h2>
         <p>Welcome Wei Gong! (not you? change user <a href="logout.php">here</a>)</p>
-        <p>Your have registered hour for the selected semester.</p>
-        <p>Your can register hours course(s) for the semester.</p>
+        <p>Your have registered <b><?php echo $bookedhour; ?></b> hour for the selected semester.</p>
+        <p>Your can register <b><?php echo $lefthour; ?></b> hours course(s) for the semester.</p>
         <p>Please note that the courses you have registered will not displayed in the list.</h5><br>
 
             <form method="post" name="form2">
@@ -127,6 +158,7 @@ if (isset($_POST['Submit'])) {
                 <input type="hidden" name="semester_code" id="semester_code" />
                 <div style="clear:both"></div>
                 <br />
+                <p style="color: #FF0000; display:inline; padding-left:2px"><?php echo $errormsg; ?></p>
                 <div class="table-responsive">
                     <table class="table table-striped table-bordered">
                         <thead>
