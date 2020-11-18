@@ -120,8 +120,23 @@ if (isset($_POST['Submit'])) {
                         }
                         $i = 0;
                         $output = '';
+                        $WeeklyHour = null;
+                        $msg = "Total Weekly Housrs";
                         if ($total_row > 0) {
                             foreach ($result as $row) {
+                                if ($i != 0)
+                                    if ($Term[$i] != $Term[$i - 1] || $Year[$i] != $Year[$i - 1]) {
+                                        $WeeklyHour = $WeeklyHour + $row["WeeklyHours"];
+                                        $output .= '
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>' . $msg . '</td>
+                                        <td>' . $WeeklyHour . '</td>
+                                        <td></td>
+                                        ';
+                                    }
+
                                 $output .= '
                                     <tr>
                                         <td>' . $Term[$i] . '</td>
@@ -132,6 +147,7 @@ if (isset($_POST['Submit'])) {
                                         <td><input type="checkbox" name="coursecode[]" value=' . $row["CourseCode"] . '></td>
                                     </tr>
                                     ';
+
                                 $i++;
                             }
                         } else {
