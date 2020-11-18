@@ -139,7 +139,7 @@ if (isset($_POST['Submit'])) {
     <div class="container">
         <br />
         <h2 style="padding-left: 5%;">Course Selection</h2>
-        <p>Welcome Wei Gong! (not you? change user <a href="logout.php">here</a>)</p>
+        <p>Welcome <b>Wei Gong!</b> (not you? change user <a href="logout.php">here</a>)</p>
         <p>Your have registered <b><?php echo $bookedhour; ?></b> hour for the selected semester.</p>
         <p>Your can register <b><?php echo $lefthour; ?></b> hours course(s) for the semester.</p>
         <p>Please note that the courses you have registered will not displayed in the list.</h5><br>
