@@ -14,7 +14,7 @@ $result = $statement->fetchAll();
 
 $StudentIdhour = $_SESSION['sess_student_id'];
 $totalHour = 16;
-$bookedhour = null;
+$bookedhour = 0;
 $sqlhour = " SELECT course.*,registration.CourseCode  FROM course,registration 
 WHERE  StudentId='$StudentIdhour' and course.CourseCode=registration.CourseCode ";
 $statementhour = $dbConn->prepare($sqlhour);
@@ -74,7 +74,8 @@ if (isset($_POST['Submit'])) {
                             $query->execute();
                         }
                     }
-                    header('location:CourseSelection.php');
+                    header('location:CurrentRegistration.php');
+                    exit();
                 } catch (PDOException $e) {
                     echo $e;
                 }

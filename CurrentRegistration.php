@@ -11,16 +11,23 @@ include_once("config.php");
 if (isset($_POST['Submit'])) {
 
     if (!empty($_POST['coursecode'])) {
-        foreach ($_POST['coursecode'] as $value) {
-            $StudentId = $_SESSION['sess_student_id'];
-            $CourseCode = $value;
 
-            $sql = "DELETE FROM registration WHERE StudentId = :StudentId and CourseCode = :CourseCode";
-            $stmt = $dbConn->prepare($sql);
-            $stmt->bindValue(':StudentId', $StudentId);
-            $stmt->bindValue(':CourseCode', $CourseCode);
-            $stmt->execute();
-            return $stmt->rowCount();
+        try {
+            foreach ($_POST['coursecode'] as $value) {
+                $StudentId = $_SESSION['sess_student_id'];
+                $CourseCode = $value;
+
+                $sql = "DELETE FROM registration WHERE StudentId = :StudentId and CourseCode = :CourseCode";
+                $stmt = $dbConn->prepare($sql);
+                $stmt->bindValue(':StudentId', $StudentId);
+                $stmt->bindValue(':CourseCode', $CourseCode);
+                $stmt->execute();
+                return $stmt->rowCount();
+            }
+            header('location:CurrentRegistration.php');
+            exit();
+        } catch (PDOException $e) {
+            echo $e;
         }
     }
 }
@@ -119,6 +126,18 @@ if (isset($_POST['Submit'])) {
                             $Year[] = $rows["Year"];
                         }
 
+                        set_error_handler('exceptions_error_handler');
+
+                        function exceptions_error_handler($severity, $message, $filename, $lineno)
+                        {
+                            if (error_reporting() == 0) {
+                                return;
+                            }
+                            if (error_reporting() & $severity) {
+                                throw new ErrorException($message, 0, $severity, $filename, $lineno);
+                            }
+                        }
+
                         $i = 0;
                         $output = '';
                         $CountHour = null;
@@ -136,10 +155,32 @@ if (isset($_POST['Submit'])) {
                                     </tr>
                                     ';
                                 $CountHour += $row["WeeklyHours"];
-                                if ($Term[$i].$Year[$i] != $Term[$i + 1].$Year[$i+1]) {
-                                    echo $CountHour . "   ";
-                                } else {
-                                    $CountHour = 0;
+
+                                try {
+                                    if ($Term[$i] . $Year[$i] != $Term[$i + 1] . $Year[$i + 1]) {
+                                        $output .= '
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>' . $msg . '</td>
+                                        <td>' . $CountHour . '</td>
+                                        <td></td>
+                                    </tr>
+                                    ';
+                                        $CountHour = 0;
+                                    }
+                                } catch (Exception $e) {
+                                    $output .= '
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>' . $msg . '</td>
+                                        <td>' . $CountHour . '</td>
+                                        <td></td>
+                                    </tr>
+                                    ';
                                 }
 
 
