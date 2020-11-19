@@ -16,7 +16,7 @@ $StudentIdhour = $_SESSION['sess_student_id'];
 $totalHour = 16;
 $bookedhour = 0;
 $sqlhour = " SELECT course.*,registration.CourseCode  FROM course,registration 
-WHERE  StudentId='$StudentIdhour' and course.CourseCode=registration.CourseCode ";
+WHERE StudentId='$StudentIdhour' and course.CourseCode=registration.CourseCode ";
 $statementhour = $dbConn->prepare($sqlhour);
 $statementhour->execute();
 $resulthour = $statementhour->fetchAll();
@@ -79,11 +79,6 @@ if (isset($_POST['Submit'])) {
                 } catch (PDOException $e) {
                     echo $e;
                 }
-
-                // if ($registeredCourses == null)
-                //     $registeredCourses = $value;
-                // else
-                //     $registeredCourses = $registeredCourses . ',' . $value;
             }
         }else{
             $errormsg="Your selection exceed the max weekly hour.";

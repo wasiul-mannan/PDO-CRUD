@@ -24,7 +24,6 @@ if (isset($_POST['Submit'])) {
                 $stmt->execute();
                 return $stmt->rowCount();
             }
-            header('location:CurrentRegistration.php');
             exit();
         } catch (PDOException $e) {
             echo $e;
