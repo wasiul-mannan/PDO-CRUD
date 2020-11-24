@@ -22,8 +22,8 @@ if (isset($_POST['Submit'])) {
                 $stmt->bindValue(':StudentId', $StudentId);
                 $stmt->bindValue(':CourseCode', $CourseCode);
                 $stmt->execute();
-                return $stmt->rowCount();
             }
+            header('location:CurrentRegistration.php');
             exit();
         } catch (PDOException $e) {
             echo $e;
